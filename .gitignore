@@ -1,0 +1,95 @@
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# ── Virtual Environments ─────────────────────────────────
+.env
+.venv
+env/
+venv/
+ENV/
+
+# ── Conda ────────────────────────────────────────────────
+.conda/
+
+# ── Jupyter Notebooks ────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── Data — never commit raw video or frames to Git ───────
+data/raw/
+data/frames/
+data/augmented/
+data/splits/
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.png
+*.jpg
+*.jpeg
+!docs/**/*.png        # allow images inside docs if you add them
+
+# ── Annotations — can be large, keep out of git ──────────
+data/annotations/
+
+# ── Model weights — too large for git ────────────────────
+weights/
+*.pt
+*.pth
+*.onnx
+*.torchscript
+*.h5
+*.pb
+
+# ── MLflow ───────────────────────────────────────────────
+mlruns/
+mlartifacts/
+
+# ── pytest / coverage ────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# ── IDEs ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS garbage ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Environment / secrets ────────────────────────────────
+.env
+*.env
+.env.local
+secrets.yaml
+
+# ── Logs ─────────────────────────────────────────────────
+logs/
+*.log
+*.json.log
+
+# ── ONNX / export artifacts ──────────────────────────────
+runs/
+exports/
