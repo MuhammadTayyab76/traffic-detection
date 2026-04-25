@@ -114,7 +114,7 @@ def build_train_pipeline(image_size: int = 640) -> A.Compose:
             ),
 
             A.GaussNoise(
-                var_limit=(10.0, 50.0),
+                std_range=(0.02, 0.1),
                 p=0.3,
             ),
 
@@ -124,9 +124,8 @@ def build_train_pipeline(image_size: int = 640) -> A.Compose:
             ),
 
             A.RandomShadow(
-                shadow_roi=(0, 0.5, 1, 1),  # shadows only on lower half (road)
-                num_shadows_lower=1,
-                num_shadows_upper=2,
+                shadow_roi=(0, 0.5, 1, 1),
+                num_shadows_limit=(1, 2),
                 shadow_dimension=5,
                 p=0.2,
             ),
@@ -134,10 +133,9 @@ def build_train_pipeline(image_size: int = 640) -> A.Compose:
             A.SafeRotate(
                 limit=10,
                 border_mode=cv2.BORDER_CONSTANT,
-                value=0,
+                fill=0,
                 p=0.3,
             ),
-
             A.RandomScale(
                 scale_limit=0.2,
                 p=0.3,
