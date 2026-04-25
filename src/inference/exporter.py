@@ -97,7 +97,8 @@ def export_model(
     dest     = out_dir / exported_path.name
 
     import shutil
-    shutil.copy(exported_path, dest)
+    if exported_path.resolve() != dest.resolve():
+        shutil.copy(exported_path, dest)
     print(f"\n  Exported model copied → {dest}")
     print(f"  File size            : {dest.stat().st_size / 1e6:.1f} MB")
 
