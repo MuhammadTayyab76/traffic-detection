@@ -36,6 +36,7 @@ data/raw/
 data/frames/
 data/augmented/
 data/splits/
+data/**/*.txt
 *.mp4
 *.avi
 *.mkv
@@ -43,7 +44,7 @@ data/splits/
 *.png
 *.jpg
 *.jpeg
-!docs/**/*.png        # allow images inside docs if you add them
+!docs/**/*.png  
 
 # ── Annotations — can be large, keep out of git ──────────
 data/annotations/

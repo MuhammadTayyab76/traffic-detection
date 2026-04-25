@@ -15,14 +15,10 @@ from tqdm import tqdm
 # Maps COCO category names → YOLO class IDs
 # names should be according to dataset category names
 DEFAULT_CLASS_MAP = {
-    "car":          0,
-    "truck":        1,
-    "bus":          2,
-    "motorcycle":   3,
-    "bicycle":      4,
-    "person":       5,
-    "traffic light":6,
-    "stop sign":    7,
+    "car":           0,
+    "pedestrian":    1,
+    "traffic light": 2,
+    "traffic sign":  3,
 }
 
 

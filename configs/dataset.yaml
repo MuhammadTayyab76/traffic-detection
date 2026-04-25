@@ -1,0 +1,17 @@
+# configs/dataset.yaml
+# YOLOv8 dataset configuration for BDD100K (Roboflow v5)
+# Paths are relative to the repo ROOT — always run training from repo root
+
+path: data/bdd100k
+
+train: train/images
+val:   valid/images
+test:  valid/images    # no test split in this export, reuse valid
+
+nc: 4
+
+names:
+  0: car
+  1: pedestrian
+  2: traffic light
+  3: traffic sign
