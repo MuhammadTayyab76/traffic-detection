@@ -7,8 +7,9 @@ channels:
 dependencies:
   - python=3.11
   - pip
-  - pytorch>=2.2.0
-  - torchvision>=0.17.0
-  - pytorch-cuda=11.8
   - pip:
+      - --index-url https://download.pytorch.org/whl/cu118
+      - torch
+      - torchvision
+      - torchaudio
       - -r requirements.txt
