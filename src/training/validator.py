@@ -11,18 +11,16 @@ from pathlib import Path
 from ultralytics import YOLO
 
 CLASS_NAMES = {
-    3:  "bike",
-    2:  "bus",
-    0:  "car",
-    10: "drivable area",
-    11: "lane",
-    6:  "motor",
-    9:  "person",
-    7:  "rider",
-    4:  "traffic light",
-    8:  "traffic sign",
-    5:  "train",
-    1:  "truck",
+    0: "bike",
+    1: "bus",
+    2: "car",
+    3: "motor",
+    4: "person",
+    5: "rider",
+    6: "traffic light",
+    7: "traffic sign",
+    8: "train",
+    9: "truck",
 }
 
 def validate(

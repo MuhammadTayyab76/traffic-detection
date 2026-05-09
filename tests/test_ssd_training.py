@@ -46,19 +46,8 @@ def _write_dummy_image(folder: Path, stem: str, width=640, height=480) -> Path:
     Image.new("RGB", (width, height), color=(128, 128, 128)).save(img_path)
     return img_path
 
-
 @pytest.fixture()
 def voc_root(tmp_path: Path) -> Path:
-    """
-    Builds a minimal VOC-style directory:
-        tmp_path/
-            train/
-                img0.jpg + img0.xml  (2 valid objects)
-                img1.jpg + img1.xml  (1 unknown class  -> skipped)
-                img2.jpg + img2.xml  (empty objects    -> dummy background box)
-            valid/
-                img3.jpg + img3.xml  (1 valid object)
-    """
     for split, samples in {
         "train": [
             ("img0", [
@@ -68,7 +57,7 @@ def voc_root(tmp_path: Path) -> Path:
             ("img1", [
                 {"name": "unknown_class", "xmin": 10, "ymin": 10, "xmax": 100, "ymax": 100},
             ]),
-            ("img2", []),  # no objects at all
+            ("img2", []),
         ],
         "valid": [
             ("img3", [
@@ -76,14 +65,15 @@ def voc_root(tmp_path: Path) -> Path:
             ]),
         ],
     }.items():
-        split_dir = tmp_path / split
-        split_dir.mkdir()
+        images_dir = tmp_path / split / "images"
+        labels_dir = tmp_path / split / "labels"
+        images_dir.mkdir(parents=True)
+        labels_dir.mkdir(parents=True)
         for stem, objects in samples:
-            _write_dummy_image(split_dir, stem)
-            _write_voc_xml(split_dir, stem, objects)
+            _write_dummy_image(images_dir, stem)
+            _write_voc_xml(labels_dir, stem, objects)
 
     return tmp_path
-
 
 @pytest.fixture()
 def ssd_config(tmp_path: Path, voc_root: Path) -> Path:
@@ -92,7 +82,7 @@ def ssd_config(tmp_path: Path, voc_root: Path) -> Path:
         "model": {
             "architecture":        "ssdlite320_mobilenet_v3_large",
             "pretrained_backbone": False,
-            "num_classes":         13,
+            "num_classes":         11,
         },
         "dataset": {
             "root":       str(voc_root),
@@ -176,7 +166,7 @@ class TestVOCDetectionDataset:
         assert target["boxes"].shape[0]  == 2
         assert target["labels"].shape[0] == 2
         labels = sorted(target["labels"].tolist())
-        assert labels == [1, 5], f"Expected [1,5] (car, traffic light), got {labels}"
+        assert labels == [3, 7], f"Expected [3,7] (car, traffic light), got {labels}"
 
     def test_unknown_class_skipped(self, voc_root):
         """img1 has only an unknown class, so it falls back to dummy background box."""
@@ -235,10 +225,10 @@ class TestVOCDetectionDataset:
         assert 0 not in CLASS_TO_IDX.values(), \
             "CLASS_TO_IDX should start at 1; 0 is reserved for background"
 
-    def test_num_classes_equals_12_plus_background(self):
+    def test_num_classes_equals_10_plus_background(self):
         from src.dataset.voc_dataset import CLASS_TO_IDX, NUM_CLASSES
         assert NUM_CLASSES == len(CLASS_TO_IDX) + 1
-        assert NUM_CLASSES == 13
+        assert NUM_CLASSES == 11
 
 class TestSSDTrainerConfig:
 
@@ -270,7 +260,7 @@ class TestSSDTrainerConfig:
     def test_build_model_output_type(self):
         from src.training.ssd_trainer import _build_model
         import torchvision
-        model = _build_model(num_classes=13, pretrained_backbone=False)
+        model = _build_model(num_classes=11, pretrained_backbone=False)
         assert isinstance(model, torch.nn.Module)
 
     def test_build_model_num_classes(self):
@@ -280,7 +270,7 @@ class TestSSDTrainerConfig:
         or we just do a forward pass check on output shape.
         """
         from src.training.ssd_trainer import _build_model
-        model = _build_model(num_classes=13, pretrained_backbone=False)
+        model = _build_model(num_classes=11, pretrained_backbone=False)
         model.eval()
         dummy = [torch.zeros(3, 320, 320)]
         with torch.no_grad():

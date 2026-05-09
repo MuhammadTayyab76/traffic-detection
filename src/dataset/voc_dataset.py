@@ -14,24 +14,19 @@ import torchvision.transforms.functional as F
 from PIL import Image
 from torch.utils.data import Dataset
 
-# 1-indexed: 0 is reserved for background by torchvision SSD
 CLASS_TO_IDX: Dict[str, int] = {
-    "car":           1,
-    "truck":         2,
-    "bus":           3,
-    "bike":          4,
-    "traffic light": 5,
-    "train":         6,
-    "motor":         7,
-    "rider":         8,
-    "traffic sign":  9,
-    "person":        10,
-    "drivable area": 11,
-    "lane":          12,
+    "bike":          1,
+    "bus":           2,
+    "car":           3,
+    "motor":         4,
+    "person":        5,
+    "rider":         6,
+    "traffic light": 7,
+    "traffic sign":  8,
+    "train":         9,
+    "truck":         10,
 }
-# 13 = 12 classes + 1 background
-NUM_CLASSES = len(CLASS_TO_IDX) + 1
-
+NUM_CLASSES = len(CLASS_TO_IDX) + 1 
 
 class VOCDetectionDataset(Dataset):
     """

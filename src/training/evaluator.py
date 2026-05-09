@@ -18,17 +18,14 @@ import numpy as np
 # Class metadata 
 
 CLASS_NAMES = [
-    "bike", "bus", "car", "drivable area", "lane", 
-    "motor", "person", "rider", "traffic light", 
-    "traffic sign", "train", "truck"
+    "bike", "bus", "car", "motor", "person",
+    "rider", "traffic light", "traffic sign", "train", "truck"
 ]
 
 CLASS_COLOURS = {
     "bike":          "#26C6DA",
     "bus":           "#1976D2",
     "car":           "#1565C0",
-    "drivable area": "#558B2F",
-    "lane":          "#9E9D24",
     "motor":         "#00ACC1",
     "person":        "#B71C1C",
     "rider":         "#EF6C00",
