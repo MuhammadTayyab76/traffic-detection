@@ -8,18 +8,18 @@ dataset:
   image_size: 320                   # SSDLite320 native resolution
 
 training:
-  epochs:       60
-  batch_size:   8                   
+  epochs:       100
+  batch_size:   16                   
   lr:           0.01
   momentum:     0.9
   weight_decay: 4.0e-5
   warmup_epochs: 3                  # linear LR warmup before cosine
-  patience:     10                  # early stopping on val loss
+  patience:     12                 # early stopping on val loss
   workers:      4
   device:       0                   
 
 output:
   project:     runs/ssd
-  name:        bdd100k_ssdlite_60ep
+  name:        bdd100k_ssdlite_100ep
   save_period: 10                   # save checkpoint every N epochs
   weights_dir: weights
