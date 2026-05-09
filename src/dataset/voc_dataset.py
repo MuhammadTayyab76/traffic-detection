@@ -45,21 +45,24 @@ class VOCDetectionDataset(Dataset):
         transforms: Optional[Callable] = None,
         image_size: int = 320,
     ) -> None:
-        self.root = Path(root) / split
+        self.images_dir = Path(root) / split / "images"
+        self.labels_dir = Path(root) / split / "labels"
         self.transforms = transforms
         self.image_size = image_size
 
         self.samples: List[Tuple[Path, Path]] = []
         for ext in ("*.jpg", "*.jpeg", "*.png"):
-            for img_path in sorted(self.root.glob(ext)):
-                xml_path = img_path.with_suffix(".xml")
+            for img_path in sorted(self.images_dir.glob(ext)):
+                xml_path = self.labels_dir / img_path.with_suffix(".xml").name
                 if xml_path.exists():
                     self.samples.append((img_path, xml_path))
 
         if not self.samples:
             raise FileNotFoundError(
-                f"No image+XML pairs found in {self.root}.\n"
-                "Make sure you ran the Roboflow VOC download into data/bdd100k_voc/."
+                f"No image+XML pairs found.\n"
+                f"  images : {self.images_dir}\n"
+                f"  labels : {self.labels_dir}\n"
+                "Check that bdd100k_voc/{split}/images/ and /labels/ are populated."
             )
 
         print(f"[VOCDataset] {split}: {len(self.samples)} samples")

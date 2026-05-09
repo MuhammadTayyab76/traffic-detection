@@ -7,6 +7,7 @@ Run from project root:
     pytest tests/test_ssd_training.py -v
 """
 import json
+import math
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -329,7 +330,7 @@ class TestSSDTrainerConfig:
         from src.training.ssd_trainer import SSDTrainer, _build_model
         trainer = SSDTrainer(ssd_config)
         result  = trainer.train()
-        model   = _build_model(num_classes=13, pretrained_backbone=False)
+        model   = _build_model(num_classes=11, pretrained_backbone=False)
         state   = torch.load(result["best_model_path"], map_location="cpu")
         model.load_state_dict(state)
 
@@ -345,5 +346,3 @@ class TestSSDTrainerConfig:
         result  = trainer.train()
         max_epochs = trainer.hp["training"]["epochs"]
         assert len(result["history"]) <= max_epochs
-
-import math
