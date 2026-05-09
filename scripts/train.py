@@ -108,6 +108,7 @@ def main():
         model_path=result["best_model_path"],
         dataset_config=hp["dataset"]["config"],
         image_size=hp["dataset"]["image_size"],
+        split="test",
     )
 
 

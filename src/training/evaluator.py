@@ -17,15 +17,26 @@ import numpy as np
 
 # Class metadata 
 
-CLASS_NAMES = ["car", "pedestrian", "traffic light", "traffic sign"]
+CLASS_NAMES = [
+    "bike", "bus", "car", "drivable area", "lane", 
+    "motor", "person", "rider", "traffic light", 
+    "traffic sign", "train", "truck"
+]
 
 CLASS_COLOURS = {
+    "bike":          "#26C6DA",
+    "bus":           "#1976D2",
     "car":           "#1565C0",
-    "pedestrian":    "#B71C1C",
+    "drivable area": "#558B2F",
+    "lane":          "#9E9D24",
+    "motor":         "#00ACC1",
+    "person":        "#B71C1C",
+    "rider":         "#EF6C00",
     "traffic light": "#F9A825",
     "traffic sign":  "#2E7D32",
+    "train":         "#6A1B9A",
+    "truck":         "#0D47A1",
 }
-
 
 # Results CSV reader 
 

@@ -1,4 +1,4 @@
-# ── Python ───────────────────────────────────────────────
+# Python 
 __pycache__/
 *.py[cod]
 *.pyo
@@ -17,26 +17,27 @@ develop-eggs/
 lib/
 lib64/
 
-# ── Virtual Environments ─────────────────────────────────
+# Virtual Environments 
 .env
 .venv
 env/
 venv/
 ENV/
 
-# ── Conda ────────────────────────────────────────────────
+# Conda 
 .conda/
 
-# ── Jupyter Notebooks ────────────────────────────────────
+# Jupyter Notebooks 
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# ── Data — never commit raw video or frames to Git ───────
+# Data 
 data/raw/
 data/frames/
 data/augmented/
 data/splits/
 data/**/*.txt
+data/**/*.xml
 *.mp4
 *.avi
 *.mkv
@@ -46,10 +47,10 @@ data/**/*.txt
 *.jpeg
 !docs/**/*.png  
 
-# ── Annotations — can be large, keep out of git ──────────
+# Annotations 
 data/annotations/
 
-# ── Model weights — too large for git ────────────────────
+# Model weights 
 weights/
 *.pt
 *.pth
@@ -58,39 +59,39 @@ weights/
 *.h5
 *.pb
 
-# ── MLflow ───────────────────────────────────────────────
+# MLflow 
 mlruns/
 mlartifacts/
 
-# ── pytest / coverage ────────────────────────────────────
+# pytest / coverage 
 .pytest_cache/
 .coverage
 htmlcov/
 coverage.xml
 
-# ── IDEs ─────────────────────────────────────────────────
+# IDEs 
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# ── OS garbage ───────────────────────────────────────────
+# OS garbage 
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ── Environment / secrets ────────────────────────────────
+# Environment / secrets 
 .env
 *.env
 .env.local
 secrets.yaml
 
-# ── Logs ─────────────────────────────────────────────────
+# Logs 
 logs/
 *.log
 *.json.log
 
-# ── ONNX / export artifacts ──────────────────────────────
+# ONNX / export artifacts 
 runs/
 exports/.gitkeep 

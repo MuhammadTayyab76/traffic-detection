@@ -2,7 +2,7 @@
 
 # Model
 model:
-  architecture: yolov8s.pt      # swap to yolov8m.pt for better training
+  architecture: yolov8s.pt
   pretrained: true
 
 # Dataset
@@ -12,9 +12,9 @@ dataset:
 
 # Training
 training:
-  epochs: 30
-  batch_size: 16
-  patience: 10
+  epochs: 80                    
+  batch_size: 16               
+  patience: 15      
   workers: 4
   device: 0
 
@@ -43,5 +43,5 @@ augmentation:
 # Output
 output:
   project: runs/train
-  name: bdd100k_yolov8s_30ep
-  save_period: 5
+  name: bdd100k_yolov8s_80ep 
+  save_period: 10 

@@ -10,14 +10,20 @@ import torch
 from pathlib import Path
 from ultralytics import YOLO
 
-
 CLASS_NAMES = {
-    0: "car",
-    1: "pedestrian",
-    2: "traffic light",
-    3: "traffic sign",
+    3:  "bike",
+    2:  "bus",
+    0:  "car",
+    10: "drivable area",
+    11: "lane",
+    6:  "motor",
+    9:  "person",
+    7:  "rider",
+    4:  "traffic light",
+    8:  "traffic sign",
+    5:  "train",
+    1:  "truck",
 }
-
 
 def validate(
     model_path: str,

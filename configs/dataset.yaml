@@ -6,12 +6,20 @@ path: data/bdd100k
 
 train: train/images
 val:   valid/images
-test:  valid/images    # no test split in this export, reuse valid
+test:  test/images     
 
-nc: 4
+nc: 12
 
 names:
-  0: car
-  1: pedestrian
-  2: traffic light
-  3: traffic sign
+  0: bike
+  1: bus
+  2: car
+  3: drivable area
+  4: lane
+  5: motor
+  6: person
+  7: rider
+  8: traffic light
+  9: traffic sign
+  10: train
+  11: truck
