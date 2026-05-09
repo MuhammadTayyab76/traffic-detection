@@ -1,0 +1,25 @@
+model:
+  architecture:         ssdlite320_mobilenet_v3_large
+  pretrained_backbone:  true
+  num_classes:          13          # 12 traffic classes + 1 background
+
+dataset:
+  root:       data/bdd100k_voc
+  image_size: 320                   # SSDLite320 native resolution
+
+training:
+  epochs:       60
+  batch_size:   8                   
+  lr:           0.01
+  momentum:     0.9
+  weight_decay: 4.0e-5
+  warmup_epochs: 3                  # linear LR warmup before cosine
+  patience:     10                  # early stopping on val loss
+  workers:      4
+  device:       0                   
+
+output:
+  project:     runs/ssd
+  name:        bdd100k_ssdlite_60ep
+  save_period: 10                   # save checkpoint every N epochs
+  weights_dir: weights
