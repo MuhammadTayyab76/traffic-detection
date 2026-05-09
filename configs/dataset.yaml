@@ -6,7 +6,7 @@ path: data/bdd100k
 
 train: train/images
 val:   valid/images
-test:  test/images     
+test:  valid/images     
 
 nc: 10
 
