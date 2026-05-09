@@ -11,6 +11,7 @@ import math
 import time
 from pathlib import Path
 from typing import Dict, List
+from tqdm import tqdm
 
 import torch
 import yaml
@@ -157,15 +158,19 @@ class SSDTrainer:
         patience_counter = 0
         history: List[Dict] = []
 
-        # loop 
+        # YOLO-style Header
+        print(f"\n{'Epoch':>10} {'GPU_mem':>10} {'train_loss':>10} {'val_loss':>10} {'lr':>10} {'Time':>10}")
+
         for epoch in range(1, epochs + 1):
             _warmup_lr(optimizer, epoch - 1, warmup_epochs, tr_cfg["lr"])
-
             model.train()
             epoch_loss = 0.0
             t0 = time.time()
 
-            for images, targets in train_loader:
+            # Moving Progress Bar (like YOLO)
+            pbar = tqdm(enumerate(train_loader), total=len(train_loader), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+            
+            for i, (images, targets) in pbar:
                 images  = [img.to(self.device) for img in images]
                 targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
 
@@ -178,8 +183,11 @@ class SSDTrainer:
                 optimizer.step()
 
                 epoch_loss += total_loss.item()
+                
+                # Update moving bar with current loss
+                current_avg = epoch_loss / (i + 1)
+                pbar.set_description(f"Batch {i+1}/{len(train_loader)} | Loss: {current_avg:.4f}")
 
-            # Step scheduler only after warmup
             if epoch > warmup_epochs:
                 scheduler.step()
 
@@ -188,12 +196,17 @@ class SSDTrainer:
             elapsed    = time.time() - t0
             current_lr = optimizer.param_groups[0]["lr"]
 
+            # GPU Memory Check
+            mem = f"{torch.cuda.memory_reserved(self.device) / 1E9:.3g}G" if self.device.type == "cuda" else "0G"
+
+            # Print formatted summary row
             print(
-                f"Epoch {epoch:3d}/{epochs} | "
-                f"train_loss={train_loss:.4f} | "
-                f"val_loss={val_loss:.4f} | "
-                f"lr={current_lr:.6f} | "
-                f"{elapsed:.0f}s"
+                f"{f'{epoch}/{epochs}':>10} "
+                f"{mem:>10} "
+                f"{train_loss:>10.4f} "
+                f"{val_loss:>10.4f} "
+                f"{current_lr:>10.6f} "
+                f"{f'{elapsed:.0f}s':>10}"
             )
 
             history.append({
@@ -204,23 +217,19 @@ class SSDTrainer:
                 "time_s":     round(elapsed, 2),
             })
 
-            # Periodic checkpoint
+            # Save logic
             if epoch % save_period == 0:
                 ckpt = str(self.weights_dir / f"ssd_epoch{epoch}.pt")
                 torch.save(model.state_dict(), ckpt)
-                print(f"  → checkpoint saved: {ckpt}")
 
-            # Best model + early stopping
             if val_loss < best_val_loss:
                 best_val_loss    = val_loss
                 patience_counter = 0
                 torch.save(model.state_dict(), best_model_path)
-                print(f"  → best model updated (val_loss={val_loss:.4f})")
             else:
                 patience_counter += 1
-                print(f"  patience {patience_counter}/{patience}")
                 if patience_counter >= patience:
-                    print(f"[SSDTrainer] Early stopping triggered at epoch {epoch}.")
+                    print(f"\n[SSDTrainer] Early stopping triggered at epoch {epoch}.")
                     break
 
         # Save training log
@@ -228,9 +237,6 @@ class SSDTrainer:
         log_path = self.run_dir / "training_log.json"
         with open(log_path, "w") as f:
             json.dump(log, f, indent=2)
-
-        print(f"\n[SSDTrainer] Complete. Best weights → {best_model_path}")
-        print(f"[SSDTrainer] Log            → {log_path}")
 
         return {
             "best_model_path": best_model_path,
