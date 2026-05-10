@@ -99,6 +99,7 @@ exports/.gitkeep
 data/bdd100k/
 data/master_dataset/
 data/master_voc_dataset/
+data/master_yolo_dataset/
 data/ua_detrac/
 *.zip
 *.pt
