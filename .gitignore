@@ -95,3 +95,11 @@ logs/
 # ONNX / export artifacts 
 runs/
 exports/.gitkeep 
+
+data/bdd100k/
+data/master_dataset/
+data/master_voc_dataset/
+data/ua_detrac/
+*.zip
+*.pt
+*.pth
