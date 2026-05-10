@@ -39,7 +39,32 @@ def _load(path: str) -> dict:
             "Run evaluate.py / evaluate_ssd.py first."
         )
     with open(p) as f:
-        return json.load(f)
+        raw = json.load(f)
+
+    # normalise YOLOv8 schema → flat schema
+    if "summary" in raw:
+        summary = raw["summary"]
+        # per_class already has ap50 per class, just strip extra keys
+        per_class = {
+            cls: {"ap50": round(vals["ap50"], 4)}
+            for cls, vals in raw.get("per_class", {}).items()
+        }
+        return {
+            "model":      raw.get("model", "yolov8s"),
+            "weights":    raw.get("weights", "weights/best.pt"),
+            "split":      raw.get("split", "valid"),
+            "num_images": raw.get("num_images", 0),
+            "map50":      round(summary.get("mAP50",     0.0), 4),
+            "map50_95":   round(summary.get("mAP50_95",  0.0), 4),
+            "precision":  round(summary.get("precision", 0.0), 4),
+            "recall":     round(summary.get("recall",    0.0), 4),
+            "fps":        round(summary.get("fps",       0.0), 1),
+            "latency_ms": round(summary.get("latency_ms",0.0), 1),
+            "per_class":  per_class,
+        }
+
+    # SSD schema is already flat — return as-is
+    return raw
 
 
 def _winner(yolo_val: float, ssd_val: float, higher_is_better: bool = True) -> str:
