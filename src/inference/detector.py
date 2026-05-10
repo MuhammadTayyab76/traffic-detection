@@ -38,7 +38,7 @@ class YOLODetector(BaseDetector):
 class SSDDetector(BaseDetector):
     def load_model(self):
         self.device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model=torchvision.models.detection.ssd300_vgg16(weights=None,num_classes=11)
+        self.model=torchvision.models.detection.ssdlite320_mobilenet_v3_large(weights=None,num_classes=11)
         self.model.load_state_dict(torch.load(self.weights_path,map_location=self.device))
         self.model.to(self.device)
         self.model.eval()
@@ -58,10 +58,19 @@ class SSDDetector(BaseDetector):
                 x1,y1,x2,y2=predictions['boxes'][i].tolist()
                 cls_id=int(predictions['labels'][i])
                 class_name=self.classes[cls_id] if cls_id<len(self.classes) else "unknown"
-                detections.append({
-                    'bbox':[int(x1),int(y1),int(x2),int(y2)],
-                    'confidence':conf,
-                    'class_id':cls_id,
-                    'class_name':class_name
-                })
+                
+                w=x2-x1
+                h=y2-y1
+                x_c=x1+(w/2)
+                y_c=y1+(h/2)
+                
+                detections.append(Detection(
+                    class_id=cls_id,
+                    class_name=class_name,
+                    confidence=conf,
+                    x_center=x_c,
+                    y_center=y_c,
+                    width=w,
+                    height=h
+                ))
         return detections
