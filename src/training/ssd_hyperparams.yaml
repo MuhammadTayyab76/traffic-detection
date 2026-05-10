@@ -4,7 +4,7 @@ model:
   num_classes:          11          # 10 traffic classes + 1 background
 
 dataset:
-  root:       data/bdd100k_voc
+  root:       data/master_voc_dataset
   image_size: 320                   # SSDLite320 native resolution
 
 training:

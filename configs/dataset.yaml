@@ -1,12 +1,8 @@
-# configs/dataset.yaml
-# YOLOv8 dataset configuration for BDD100K (Roboflow v5)
-# Paths are relative to the repo ROOT — always run training from repo root
-
-path: data/bdd100k
+path: data/master_yolo_dataset
 
 train: train/images
 val:   valid/images
-test:  valid/images     
+test:  valid/images
 
 nc: 10
 
