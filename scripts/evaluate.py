@@ -49,7 +49,10 @@ def _measure_fps(weights: str, dataset: str, n_warmup: int = 5) -> tuple[float, 
     try:
         from ultralytics import YOLO
         model  = YOLO(weights)
-        source = Path(dataset).parent.parent / "master_yolo_dataset" / "valid" / "images"
+        import yaml
+        with open(dataset) as f:
+            cfg = yaml.safe_load(f)
+        source = Path(cfg["path"]) / "valid" / "images"
         if not source.exists():
             return 0.0, 0.0
 
