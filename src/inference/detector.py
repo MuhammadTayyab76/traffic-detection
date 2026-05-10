@@ -2,6 +2,7 @@ import torch
 import torchvision
 from ultralytics import YOLO
 from src.models.base_detector import BaseDetector
+from src.analytics.stats_collector import Detection
 
 class YOLODetector(BaseDetector):
     def load_model(self):
@@ -17,12 +18,21 @@ class YOLODetector(BaseDetector):
                 conf=float(box.conf[0])
                 cls_id=int(box.cls[0])
                 class_name=self.model.names[cls_id]
-                detections.append({
-                    'bbox':[int(x1),int(y1),int(x2),int(y2)],
-                    'confidence':conf,
-                    'class_id':cls_id,
-                    'class_name':class_name
-                })
+                
+                w = x2 - x1
+                h = y2 - y1
+                x_c = x1 + (w / 2)
+                y_c = y1 + (h / 2)
+                
+                detections.append(Detection(
+                    class_id=cls_id,
+                    class_name=class_name,
+                    confidence=conf,
+                    x_center=x_c,
+                    y_center=y_c,
+                    width=w,
+                    height=h
+                ))
         return detections
 
 class SSDDetector(BaseDetector):
