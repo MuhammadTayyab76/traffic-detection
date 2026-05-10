@@ -10,15 +10,18 @@ Requirements:
 Usage (from project root, conda env active):
     python scripts/evaluate_ssd.py
     python scripts/evaluate_ssd.py --weights weights/ssd_best.pt
-                                   --data    data/bdd100k_voc
+                                   --data    data/master_voc_dataset
                                    --split   valid
 """
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import torch
 from torch.utils.data import DataLoader
@@ -38,7 +41,7 @@ IDX_TO_NAME = {i + 1: name for i, name in enumerate(CLASS_NAMES)}
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Evaluate SSDLite320 on validation set")
     p.add_argument("--weights",    default="weights/ssd_best.pt")
-    p.add_argument("--data",       default="data/bdd100k_voc")
+    p.add_argument("--data", default="data/master_voc_dataset")
     p.add_argument("--split",      default="valid")
     p.add_argument("--image-size", type=int, default=320)
     p.add_argument("--batch-size", type=int, default=8)
@@ -63,7 +66,7 @@ def evaluate(args: argparse.Namespace) -> dict:
             "Run python scripts/train_ssd.py first."
         )
 
-    model = _build_model(num_classes=NUM_CLASSES, pretrained_backbone=False)
+    model = _build_model(num_classes=NUM_CLASSES, pretrained_backbone=True)
     state = torch.load(weights_path, map_location=device)
     model.load_state_dict(state)
     model.to(device)

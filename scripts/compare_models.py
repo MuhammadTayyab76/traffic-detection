@@ -14,6 +14,8 @@ import argparse
 import json
 from pathlib import Path
 
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 YOLO_DEFAULT = "evaluation_outputs/yolov8s_80ep_evaluation.json"
 SSD_DEFAULT  = "evaluation_outputs/ssd_evaluation.json"

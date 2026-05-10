@@ -103,3 +103,6 @@ data/ua_detrac/
 *.zip
 *.pt
 *.pth
+*.cache
+evluation_outputs/plots/
+*.json
