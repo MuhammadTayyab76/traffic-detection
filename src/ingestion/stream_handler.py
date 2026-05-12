@@ -32,7 +32,7 @@ class StreamHandler:
             # 2. Track
             tracked_objects = self.tracker.update(detections)
             
-            # 3. Log Stats (FIXED: Now only passes tracked_objects, as your class tracks the frame count internally!)
+            # 3. Log Stats
             self.stats_collector.update(tracked_objects)
             
             # 4. Draw Boxes
