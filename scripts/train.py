@@ -1,13 +1,4 @@
 """
-scripts/train.py
-
-Entry point for training. Run from the repo ROOT directory.
-
-Usage:
-    # Standard training run (uses hyperparams.yaml settings)
-    python scripts/train.py
-
-    # Override epochs or model without editing yaml
     python scripts/train.py --epochs 20
     python scripts/train.py --model yolov8m.pt --epochs 80
     python scripts/train.py --eval-only --weights weights/bdd100k_yolov8s_30ep_best.pt
@@ -89,7 +80,6 @@ def main():
     hp = apply_overrides(hp, args)
 
     # Write overridden hp back temporarily so trainer picks them up
-    # (trainer re-reads the yaml — so we patch it in memory instead)
     # Pass hp directly to avoid re-reading from disk
     import src.training.trainer as trainer_module
 

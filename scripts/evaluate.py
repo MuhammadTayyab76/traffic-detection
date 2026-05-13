@@ -126,14 +126,14 @@ def main():
     print(f"  Output dir : {args.output_dir}")
     print("=" * 55 + "\n")
 
-    print("── Step 1: Running model inference on val set ──")
+    print(" Step 1: Running model inference on val set ")
     results = validate(
         model_path=args.weights,
         dataset_config=args.dataset,
     )
 
     if args.results_dir:
-        print("\n── Step 2: Generating training curves ──────────")
+        print("\n Step 2: Generating training curves ")
         try:
             plot_training_curves(
                 results_dir=args.results_dir,
@@ -143,24 +143,24 @@ def main():
         except FileNotFoundError as e:
             print(f"  Skipping training curves: {e}")
     else:
-        print("\n── Step 2: Skipped (no --results-dir provided) ─")
+        print("\nStep 2: Skipped (no --results-dir provided)")
 
-    print("\n── Step 3: Generating per-class bar chart ──────")
+    print("\n Step 3: Generating per-class bar chart ")
     plot_per_class_metrics(
         per_class_results=results,
         output_dir=args.output_dir,
         show=args.show_plots,
     )
 
-    print("\n── Step 4: Measuring FPS ───────────────────────")
+    print("\n Step 4: Measuring FPS ")
     fps, latency_ms = _measure_fps(args.weights, args.dataset)
     print(f"  FPS        : {fps}")
     print(f"  Latency ms : {latency_ms}")
 
-    print("\n── Step 5: Saving flat evaluation JSON ─────────")
+    print("\nStep 5: Saving flat evaluation JSON ")
     _save_flat_json(results, model_name, fps, latency_ms, args.output_dir)
 
-    print("\n── Step 6: Summary table ────────────────────────")
+    print("\n Step 6: Summary table ")
     summary = results.get("_summary", {})
     print_comparison_table([{
         "model":     model_name,

@@ -42,23 +42,17 @@ class Trainer:
         self.hp = load_hyperparams(hyperparams_path)
 
     def train(self) -> dict:
-        """
-        Run a full YOLOv8 training run using the project hyperparams.
-
-        Returns:
-            dict containing best_model_path, results_dir, and metrics summary.
-        """
         hp = self.hp
 
-        print("\n" + "="*55)
+        print("\n")
         print("  Traffic Detection — YOLOv8 Training")
-        print("="*55)
+        print("\n")
         print(f"  Architecture : {hp['model']['architecture']}")
         print(f"  Dataset      : {hp['dataset']['config']}")
         print(f"  Epochs       : {hp['training']['epochs']}")
         print(f"  Batch size   : {hp['training']['batch_size']}")
         print(f"  Image size   : {hp['dataset']['image_size']}")
-        print("="*55 + "\n")
+        print("\n")
 
         device = get_device(hp["training"]["device"])
 

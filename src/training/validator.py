@@ -31,15 +31,6 @@ def validate(
 ) -> dict:
     """
     Evaluate a trained YOLOv8 model and print a full metrics report.
-
-    Args:
-        model_path:     Path to .pt weights file.
-        dataset_config: Path to dataset.yaml.
-        image_size:     Must match the size used during training.
-        split:          'val' or 'test' (we only have val in our dataset).
-
-    Returns:
-        dict with mAP50, mAP50_95, precision, recall per class.
     """
     print("\n" + "="*55)
     print("  Traffic Detection — Model Evaluation")
@@ -61,9 +52,9 @@ def validate(
     )
 
     # Extract and print clean report
-    print("\n" + "="*55)
+    print("\n")
     print("  EVALUATION RESULTS")
-    print("="*55)
+    print("\n")
 
     map50    = metrics.box.map50
     map5095  = metrics.box.map
@@ -92,7 +83,7 @@ def validate(
         print(f"  {name:<16} {ap:>8.4f} {p:>10.4f} {r:>8.4f}")
         results[name] = {"ap50": ap, "precision": p, "recall": r}
 
-    print("="*55 + "\n")
+    print("\n")
 
     results["_summary"] = {
         "mAP50":     map50,
@@ -108,15 +99,12 @@ def compare_models(model_paths: list[str],
     """
     Evaluate multiple model checkpoints and print a comparison table.
     Useful for comparing yolov8s vs yolov8m after both are trained.
-
-    Args:
-        model_paths: List of .pt file paths to compare.
     """
-    print("\n" + "="*65)
+    print("\n")
     print("  MODEL COMPARISON")
-    print("="*65)
+    print("\n")
     print(f"  {'Model':<35} {'mAP@0.5':>8} {'mAP@0.5:0.95':>13} {'P':>6} {'R':>6}")
-    print("  " + "-"*60)
+    print("\n")
 
     for path in model_paths:
         if not Path(path).exists():
@@ -133,5 +121,3 @@ def compare_models(model_paths: list[str],
         print(f"  {name:<35} {m.box.map50:>8.4f} "
               f"{m.box.map:>13.4f} "
               f"{m.box.mp:>6.4f} {m.box.mr:>6.4f}")
-
-    print("="*65 + "\n")

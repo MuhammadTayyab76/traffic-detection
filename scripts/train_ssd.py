@@ -1,8 +1,4 @@
 """
-Run SSDLite320 training.
-
-Usage (from project root, conda env active):
-    python scripts/train_ssd.py
     python scripts/train_ssd.py --config src/training/ssd_hyperparams.yaml
 """
 from __future__ import annotations

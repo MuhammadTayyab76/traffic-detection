@@ -1,21 +1,4 @@
 """
-Generate all evaluation plots for the model comparison report.
-Reads:
-    evaluation_outputs/yolov8s_80ep_evaluation.json
-    evaluation_outputs/ssd_evaluation.json
-    evaluation_outputs/comparison_report.json
-    runs/ssd/bdd100k_ssdlite_100ep/training_log.json
-    runs/train/bdd100k_yolov8s_80ep/results.csv   (Ultralytics auto-generated)
-
-Produces (all saved to evaluation_outputs/plots/):
-    ssd_loss_curve.png
-    yolo_loss_curve.png
-    metric_comparison.png
-    per_class_ap_comparison.png
-    precision_recall_comparison.png
-
-Usage (from project root, conda env active):
-    python scripts/generate_report.py
     python scripts/generate_report.py --out-dir evaluation_outputs/plots
 """
 from __future__ import annotations

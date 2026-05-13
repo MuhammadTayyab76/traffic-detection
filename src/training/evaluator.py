@@ -40,13 +40,6 @@ CLASS_COLOURS = {
 def read_results_csv(results_dir: str) -> list[dict]:
     """
     Read Ultralytics results.csv into a list of epoch dicts.
-
-    Args:
-        results_dir: Path to the run folder containing results.csv
-                     e.g. runs/detect/runs/train/bdd100k_yolov8s_30ep
-
-    Returns:
-        List of dicts, one per epoch, with cleaned column names as keys.
     """
     csv_path = Path(results_dir) / "results.csv"
     if not csv_path.exists():
@@ -84,14 +77,6 @@ def plot_training_curves(
       - mAP@0.5
       - mAP@0.5:0.95
       - Precision & Recall
-
-    Args:
-        results_dir: Run folder containing results.csv
-        output_dir:  Where to save the figure (defaults to results_dir)
-        show:        If True, display the plot interactively
-
-    Returns:
-        Path to saved figure.
     """
     rows       = read_results_csv(results_dir)
     epochs     = list(range(1, len(rows) + 1))
@@ -184,14 +169,6 @@ def plot_per_class_metrics(
 ) -> str:
     """
     Generate a grouped bar chart of per-class AP@0.5, Precision, Recall.
-
-    Args:
-        per_class_results: Dict from validator.validate() keyed by class name.
-        output_dir:        Where to save the figure.
-        show:              Display interactively.
-
-    Returns:
-        Path to saved figure.
     """
     classes   = [c for c in per_class_results if not c.startswith("_")]
     ap50_vals = [per_class_results[c]["ap50"]      for c in classes]
@@ -242,15 +219,8 @@ def save_evaluation_summary(
 ) -> str:
     """
     Save evaluation results as a structured JSON file.
-
-    Args:
-        results:    Output from validator.validate()
-        model_name: e.g. 'yolov8s_30ep'
-        output_dir: Where to write the JSON
-
-    Returns:
-        Path to saved JSON.
     """
+
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     save_path = out / f"{model_name}_evaluation.json"
@@ -275,10 +245,6 @@ def save_evaluation_summary(
 def print_comparison_table(summaries: list[dict]) -> None:
     """
     Print a formatted comparison table across multiple model runs.
-
-    Args:
-        summaries: List of dicts, each with keys:
-                   model, mAP50, mAP50_95, precision, recall, fps
     """
     print("\n" + "="*70)
     print("  MODEL COMPARISON TABLE")

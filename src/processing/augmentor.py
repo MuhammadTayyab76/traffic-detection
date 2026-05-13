@@ -21,17 +21,6 @@ from pathlib import Path
 # Bbox format helpers 
 
 def yolo_to_albumentations(bboxes: list) -> tuple[list, list]:
-    """
-    Convert YOLO bbox rows to Albumentations format.
-
-    Args:
-        bboxes: List of [class_id, x_center, y_center, w, h] rows.
-
-    Returns:
-        (alb_bboxes, class_labels)
-        alb_bboxes  : [[x_min, y_min, x_max, y_max], ...]  normalised
-        class_labels: [class_id, ...]
-    """
     alb_bboxes   = []
     class_labels = []
 
@@ -56,12 +45,6 @@ def yolo_to_albumentations(bboxes: list) -> tuple[list, list]:
 
 
 def albumentations_to_yolo(alb_bboxes: list, class_labels: list) -> list:
-    """
-    Convert Albumentations bbox output back to YOLO format rows.
-
-    Returns:
-        List of [class_id, x_center, y_center, w, h] rows.
-    """
     yolo_rows = []
     for (x_min, y_min, x_max, y_max), cls in zip(alb_bboxes, class_labels):
         x_c = (x_min + x_max) / 2
@@ -89,12 +72,6 @@ def build_train_pipeline(image_size: int = 640) -> A.Compose:
       - Safe rotate (±10°)       : slight camera tilt variation
       - Random scale             : object size variation
       - Resize to target size    : final resize always happens last
-
-    Args:
-        image_size: Target square image size (default 640 for YOLOv8).
-
-    Returns:
-        An albumentations Compose pipeline.
     """
     return A.Compose(
         [
@@ -156,10 +133,6 @@ def build_train_pipeline(image_size: int = 640) -> A.Compose:
 
 
 def build_val_pipeline(image_size: int = 640) -> A.Compose:
-    """
-    Validation pipeline — only resize, no random transforms.
-    Keeps evaluation deterministic.
-    """
     return A.Compose(
         [A.Resize(height=image_size, width=image_size)],
         bbox_params=A.BboxParams(
@@ -178,17 +151,6 @@ def augment_sample(
     yolo_bboxes: list,
     pipeline: A.Compose,
 ) -> tuple[np.ndarray, list]:
-    """
-    Apply an augmentation pipeline to one image and its YOLO bboxes.
-
-    Args:
-        image:       HxWxC numpy array (BGR from OpenCV).
-        yolo_bboxes: List of [class_id, x_c, y_c, w, h] rows.
-        pipeline:    Albumentations Compose pipeline.
-
-    Returns:
-        (augmented_image, augmented_yolo_bboxes)
-    """
     alb_bboxes, class_labels = yolo_to_albumentations(yolo_bboxes)
 
     result = pipeline(
@@ -215,23 +177,6 @@ def augment_dataset(
     copies_per_image: int = 2,
     image_size: int = 640,
 ) -> dict:
-    """
-    Augment every image in a dataset folder and write new copies to disk.
-
-    The original images are NOT modified — augmented copies are written
-    alongside them with a suffix like _aug0, _aug1, etc.
-
-    Args:
-        images_dir:         Folder containing source images (.jpg / .png).
-        labels_dir:         Folder containing YOLO .txt label files.
-        output_images_dir:  Where to write augmented images.
-        output_labels_dir:  Where to write augmented label files.
-        copies_per_image:   How many augmented versions to generate per image.
-        image_size:         Target size for resize (default 640).
-
-    Returns:
-        dict with keys: processed, augmented, skipped_no_label, skipped_no_image
-    """
     images_path = Path(images_dir)
     labels_path = Path(labels_dir)
     out_img     = Path(output_images_dir)

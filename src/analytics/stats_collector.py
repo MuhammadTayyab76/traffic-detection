@@ -1,18 +1,3 @@
-"""
-stats_collector.py
-
-Collects, aggregates, and logs per-frame detection statistics.
-
-Receives a list of Detection objects each frame and maintains:
-  - Per-frame counts per class
-  - Rolling average confidence per class
-  - Session-level totals
-  - JSON log of every frame (for post-analysis)
-
-This module is intentionally stateful — instantiate once per
-video session and call update() on every frame.
-"""
-
 import json
 import time
 from collections import defaultdict
@@ -55,18 +40,6 @@ class FrameStats:
 # Stats collector 
 
 class StatsCollector:
-    """
-    Stateful per-session statistics collector.
-
-    Usage:
-        collector = StatsCollector(class_names=[...])
-        for frame in video:
-            detections = model.detect(frame)
-            stats = collector.update(detections)
-            gui.update_sidebar(stats)
-        collector.save_log("session_log.json")
-    """
-
     def __init__(
         self,
         class_names: list[str],
@@ -74,7 +47,6 @@ class StatsCollector:
         rolling_window: int = 30,
     ):
         """
-        Args:
             class_names:        List of class name strings matching model output.
             log_every_n_frames: Save to internal log every N frames.
                                 1 = every frame, 30 = every second at 30fps.
@@ -100,18 +72,9 @@ class StatsCollector:
         self._conf_history: dict[str, list[float]] = {
             name: [] for name in class_names
         }
-
-    # Core Update Method
-
     def update(self, detections: list[Detection]) -> FrameStats:
         """
         Process detections for one frame and return a FrameStats snapshot.
-
-        Args:
-            detections: List of Detection objects from the inference engine.
-
-        Returns:
-            FrameStats for the current frame.
         """
         now = time.time()
 
@@ -182,8 +145,6 @@ class StatsCollector:
             "most_detected":   max(self._session_counts, key=self._session_counts.get)
                                if self._session_counts else None,
         }
-
-    # Persistence 
 
     def save_log(self, output_path: str) -> None:
         """

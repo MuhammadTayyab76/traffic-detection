@@ -11,20 +11,6 @@ SUPPORTED_EXTENSIONS = {".mp4", ".avi", ".mkv", ".mov"}
 
 
 def load_video(source: str) -> cv2.VideoCapture:
-    """
-    Open a video file or RTSP stream.
-
-    Args:
-        source: Path to a video file OR an RTSP URL string.
-
-    Returns:
-        An opened cv2.VideoCapture object.
-
-    Raises:
-        FileNotFoundError: If a local file path does not exist.
-        ValueError:        If the file extension is not supported.
-        RuntimeError:      If OpenCV cannot open the source.
-    """
     # Local file validation
     if not source.startswith("rtsp://"):
         path = Path(source)
@@ -45,12 +31,6 @@ def load_video(source: str) -> cv2.VideoCapture:
 
 
 def get_video_info(cap: cv2.VideoCapture) -> dict:
-    """
-    Extract basic metadata from an open VideoCapture.
-
-    Returns:
-        dict with keys: width, height, fps, total_frames
-    """
     return {
         "width":        int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
         "height":       int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),

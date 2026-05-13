@@ -4,9 +4,6 @@ Computes mAP@0.5, mAP@0.5:0.95, per-class precision/recall, and FPS.
 Outputs evaluation_outputs/ssd_evaluation.json in the same schema
 as the YOLOv8 evaluation JSON so compare_models.py can read both.
 
-Requirements:
-    pip install torchmetrics
-
 Usage (from project root, conda env active):
     python scripts/evaluate_ssd.py
     python scripts/evaluate_ssd.py --weights weights/ssd_best.pt

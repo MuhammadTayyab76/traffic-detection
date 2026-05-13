@@ -29,15 +29,6 @@ CLASS_TO_IDX: Dict[str, int] = {
 NUM_CLASSES = len(CLASS_TO_IDX) + 1 
 
 class VOCDetectionDataset(Dataset):
-    """
-    Loads Roboflow-exported PASCAL VOC annotations.
-
-    Expected layout (Roboflow default):
-        <root>/<split>/image_001.jpg
-        <root>/<split>/image_001.xml
-        ...
-    """
-
     def __init__(
         self,
         root: str | Path,
