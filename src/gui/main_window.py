@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
+from src.gui.video_widget import VideoWidget
+from src.gui.controls import ControlsPanel
 
 
 class MainWindow(QMainWindow):
@@ -13,10 +14,12 @@ class MainWindow(QMainWindow):
         central = QWidget()
         layout = QVBoxLayout(central)
 
-        # Placeholder — replaced by VideoWidget in feature/video-widget
-        placeholder = QLabel("Video display will be added here")
-        placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(placeholder)
+        self.video_widget = VideoWidget()
+        layout.addWidget(self.video_widget)
+
+        self.controls_panel = ControlsPanel()
+        
+        layout.addWidget(self.controls_panel)
 
         self.setCentralWidget(central)
         self.statusBar().showMessage("Ready")
