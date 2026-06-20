@@ -1,13 +1,9 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
+import os
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QMessageBox
 from src.gui.video_widget import VideoWidget
 from src.gui.controls import ControlsPanel
 from src.gui.stats_panel import StatsPanel
-
-# Mirrors the class list used in run_demo.py / SSDDetector until a shared class_map exists
-CLASS_NAMES = [
-    'background', 'bike', 'bus', 'car', 'motor', 'person',
-    'rider', 'traffic light', 'traffic sign', 'train', 'truck'
-]
+from src.gui.inference_worker import InferenceWorker, CLASS_NAMES
 
 
 class MainWindow(QMainWindow):
@@ -15,7 +11,10 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Traffic Detection System")
         self.resize(1280, 760)
+        self.worker = None
+        self._is_playing = False
         self._build_ui()
+        self._connect_signals()
 
     def _build_ui(self):
         central = QWidget()
@@ -35,3 +34,77 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(central)
         self.statusBar().showMessage("Ready")
+
+    def _connect_signals(self):
+        self.controls_panel.video_selected.connect(self._on_video_selected)
+        self.controls_panel.play_pause_clicked.connect(self._on_play_pause_clicked)
+        self.controls_panel.model_changed.connect(self._on_model_changed)
+        self.controls_panel.threshold_changed.connect(self._on_threshold_changed)
+        self.controls_panel.seek_changed.connect(self._on_seek_changed)
+        self.controls_panel.speed_changed.connect(self._on_speed_changed)
+
+    def _on_video_selected(self, path: str):
+        self._stop_worker()
+        self.video_widget.clear_frame()
+        self.stats_panel.reset()
+
+        model_name = self.controls_panel.model_combo.currentText()
+        self.worker = InferenceWorker(video_path=path, model_name=model_name)
+        self.worker.frame_ready.connect(self.video_widget.set_frame)
+        self.worker.stats_ready.connect(self.stats_panel.update_stats)
+        self.worker.video_info_ready.connect(self._on_video_info_ready)
+        self.worker.frame_idx_changed.connect(self.controls_panel.update_seek_position)
+        self.worker.error_occurred.connect(self._on_worker_error)
+        self.worker.finished_processing.connect(self._on_worker_finished)
+
+        self.worker.start()
+        self._is_playing = True
+        self.controls_panel.set_play_pause_text(True)
+        self.statusBar().showMessage(f"Playing: {os.path.basename(path)}")
+
+    def _on_video_info_ready(self, info: dict):
+        self.controls_panel.set_seek_range(info["total_frames"])
+
+    def _on_play_pause_clicked(self):
+        if self.worker is None:
+            return
+        self.worker.toggle_pause()
+        self._is_playing = not self._is_playing
+        self.controls_panel.set_play_pause_text(self._is_playing)
+
+    def _on_model_changed(self, model_name: str):
+        if self.worker is not None:
+            self.worker.set_model(model_name)
+
+    def _on_threshold_changed(self, value: float):
+        if self.worker is not None:
+            self.worker.set_threshold(value)
+
+    def _on_seek_changed(self, frame_idx: int):
+        if self.worker is not None:
+            self.worker.seek(frame_idx)
+
+    def _on_speed_changed(self, multiplier: float):
+        if self.worker is not None:
+            self.worker.set_speed(multiplier)
+
+    def _on_worker_error(self, message: str):
+        self._stop_worker()
+        QMessageBox.critical(self, "Video Error", message)
+        self.statusBar().showMessage("Error loading video")
+
+    def _on_worker_finished(self):
+        self._is_playing = False
+        self.controls_panel.set_play_pause_text(False)
+        self.statusBar().showMessage("Playback finished")
+
+    def _stop_worker(self):
+        # wait() blocks until run() exits cleanly, avoids killing the thread mid-frame
+        if self.worker is not None and self.worker.isRunning():
+            self.worker.stop()
+            self.worker.wait()
+        self.worker = None
+
+    def closeEvent(self, event):
+        self._stop_worker()
+        event.accept()
