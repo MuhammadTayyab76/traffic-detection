@@ -15,30 +15,31 @@ CLASS_NAMES = [
 
 WEIGHTS_PATHS = {
     "yolo": "weights/yolo_best.pt",
-    "ssd":  "weights/ssd_best.pt",
+    "ssd": "weights/ssd_best.pt",
 }
 
 
 class InferenceWorker(QThread):
-    frame_ready        = pyqtSignal(object)
-    stats_ready        = pyqtSignal(object)
-    video_info_ready   = pyqtSignal(dict)
-    frame_idx_changed  = pyqtSignal(int)
-    error_occurred     = pyqtSignal(str)
+    frame_ready = pyqtSignal(object)        # drawn cv2 frame
+    stats_ready = pyqtSignal(object)        # FrameStats
+    video_info_ready = pyqtSignal(dict)
+    frame_idx_changed = pyqtSignal(int)
+    error_occurred = pyqtSignal(str)
     finished_processing = pyqtSignal()
 
     def __init__(self, video_path: str, model_name: str = "yolo", parent=None):
         super().__init__(parent)
-        self.video_path          = video_path
-        self._model_name         = model_name
+        self.video_path = video_path
+        self._model_name = model_name
         self._pending_model_name = model_name
-        self._threshold          = 0.25
-        self._speed              = 1.0
-        self._running            = True
-        self._paused             = False
-        self._pending_seek       = None
-        self._mutex              = QMutex()
+        self._threshold = 0.25
+        self._speed = 1.0
+        self._running = True
+        self._paused = False
+        self._pending_seek = None
+        self._mutex = QMutex()
 
+    # All setters below are called from the GUI thread, mutex-guarded to avoid races with run()
     def toggle_pause(self):
         with QMutexLocker(self._mutex):
             self._paused = not self._paused
@@ -64,22 +65,10 @@ class InferenceWorker(QThread):
             self._running = False
 
     def _build_detector(self, model_name: str):
-        return (YOLODetector if model_name == "yolo" else SSDDetector)(
-            weights_path=WEIGHTS_PATHS[model_name]
-        )
-
-    @staticmethod
-    def _frames_to_skip(speed: float) -> int:
-        """
-        Number of frames to grab-and-discard between each decoded frame.
-        0.5x / 1x -> 0 skips (slowdown handled by sleep alone)
-        1.5x      -> 1 skip  (decode every 2nd frame  ~ 1.5x faster)
-        2x        -> 1 skip  (decode every 2nd frame  = 2x faster)
-        Works cleanly for the four options in the combo box.
-        """
-        if speed <= 1.0:
-            return 0
-        return max(1, round(speed) - 1)
+        weights_path = WEIGHTS_PATHS[model_name]
+        if model_name == "yolo":
+            return YOLODetector(weights_path=weights_path)
+        return SSDDetector(weights_path=weights_path)
 
     def run(self):
         try:
@@ -90,66 +79,58 @@ class InferenceWorker(QThread):
 
         video_info = get_video_info(cap)
         self.video_info_ready.emit(video_info)
-        fps            = video_info["fps"] or 30.0
-        frame_duration = 1.0 / fps          # seconds per frame at 1x
+        fps = video_info["fps"] or 30.0
+        frame_duration = 1.0 / fps
 
-        detector      = self._build_detector(self._model_name)
-        tracker       = SimpleTracker()
+        detector = self._build_detector(self._model_name)
+        tracker = SimpleTracker()
         postprocessor = Postprocessor()
         stats_collector = StatsCollector(class_names=CLASS_NAMES)
 
         while True:
             with QMutexLocker(self._mutex):
-                running       = self._running
-                paused        = self._paused
-                threshold     = self._threshold
-                speed         = self._speed
+                running = self._running
+                paused = self._paused
+                threshold = self._threshold
+                speed = self._speed
                 pending_model = self._pending_model_name
-                pending_seek  = self._pending_seek
+                pending_seek = self._pending_seek
                 self._pending_seek = None
 
             if not running:
                 break
 
             if pending_model != self._model_name:
-                detector         = self._build_detector(pending_model)
-                tracker          = SimpleTracker()
+                detector = self._build_detector(pending_model)
+                tracker = SimpleTracker()
                 self._model_name = pending_model
 
             if pending_seek is not None:
                 cap.set(cv2.CAP_PROP_POS_FRAMES, pending_seek)
-                tracker = SimpleTracker()
+                tracker = SimpleTracker()  # track IDs are meaningless across a jump
 
             if paused:
                 self.msleep(50)
                 continue
-
-            # --- Frame skipping for speed > 1x ---
-            # cap.grab() advances the decode position without returning pixels,
-            # so it is much cheaper than cap.read() for discarded frames.
-            skip = self._frames_to_skip(speed)
-            for _ in range(skip):
-                if not cap.grab():
-                    break
 
             t_start = time.perf_counter()
             ret, frame = cap.read()
             if not ret:
                 break
 
+            # Backend detectors don't accept a confidence arg, so threshold is applied here
             detections = [d for d in detector.detect(frame) if d.confidence >= threshold]
-            tracked    = tracker.update(detections)
-            stats      = stats_collector.update(tracked)
-            out_frame  = postprocessor.draw_boxes(frame, tracked)
+            tracked = tracker.update(detections)
+            stats = stats_collector.update(tracked)
+            out_frame = postprocessor.draw_boxes(frame, tracked)
 
             self.frame_ready.emit(out_frame)
             self.stats_ready.emit(stats)
             self.frame_idx_changed.emit(int(cap.get(cv2.CAP_PROP_POS_FRAMES)))
 
-            elapsed   = time.perf_counter() - t_start
-            target    = frame_duration * (1 + skip) / max(speed, 0.01)
-            remaining = target - elapsed
-            if remaining > 0.005:   # ignore sub-5ms remainders
+            elapsed = time.perf_counter() - t_start
+            remaining = (frame_duration / max(speed, 0.01)) - elapsed
+            if remaining > 0:
                 self.msleep(int(remaining * 1000))
 
         cap.release()
